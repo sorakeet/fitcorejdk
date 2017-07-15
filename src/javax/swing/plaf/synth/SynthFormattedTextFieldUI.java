@@ -1,0 +1,33 @@
+/**
+ * Copyright (c) 2002, 2013, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+package javax.swing.plaf.synth;
+
+import javax.swing.*;
+import javax.swing.plaf.ComponentUI;
+import java.awt.*;
+
+public class SynthFormattedTextFieldUI extends SynthTextFieldUI{
+    public static ComponentUI createUI(JComponent c){
+        return new SynthFormattedTextFieldUI();
+    }
+
+    @Override
+    protected String getPropertyPrefix(){
+        return "FormattedTextField";
+    }
+
+    @Override
+    void paintBackground(SynthContext context,Graphics g,JComponent c){
+        context.getPainter().paintFormattedTextFieldBackground(context,g,0,
+                0,c.getWidth(),c.getHeight());
+    }
+
+    @Override
+    public void paintBorder(SynthContext context,Graphics g,int x,
+                            int y,int w,int h){
+        context.getPainter().paintFormattedTextFieldBorder(context,g,x,y,
+                w,h);
+    }
+}

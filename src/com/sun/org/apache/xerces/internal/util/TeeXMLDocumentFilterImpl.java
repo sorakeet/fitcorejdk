@@ -1,0 +1,242 @@
+/**
+ * Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * <p>
+ * The Apache Software License, Version 1.1
+ * <p>
+ * <p>
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
+ * reserved.
+ * <p>
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * <p>
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ * <p>
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in
+ * the documentation and/or other materials provided with the
+ * distribution.
+ * <p>
+ * 3. The end-user documentation included with the redistribution,
+ * if any, must include the following acknowledgment:
+ * "This product includes software developed by the
+ * Apache Software Foundation (http://www.apache.org/)."
+ * Alternately, this acknowledgment may appear in the software itself,
+ * if and wherever such third-party acknowledgments normally appear.
+ * <p>
+ * 4. The names "Xerces" and "Apache Software Foundation" must
+ * not be used to endorse or promote products derived from this
+ * software without prior written permission. For written
+ * permission, please contact apache@apache.org.
+ * <p>
+ * 5. Products derived from this software may not be called "Apache",
+ * nor may "Apache" appear in their name, without prior written
+ * permission of the Apache Software Foundation.
+ * <p>
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ * <p>
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation and was
+ * originally based on software copyright (c) 1999, International
+ * Business Machines, Inc., http://www.apache.org.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ */
+/**
+ * The Apache Software License, Version 1.1
+ *
+ *
+ * Copyright (c) 2000-2002 The Apache Software Foundation.  All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in
+ *    the documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * 3. The end-user documentation included with the redistribution,
+ *    if any, must include the following acknowledgment:
+ *       "This product includes software developed by the
+ *        Apache Software Foundation (http://www.apache.org/)."
+ *    Alternately, this acknowledgment may appear in the software itself,
+ *    if and wherever such third-party acknowledgments normally appear.
+ *
+ * 4. The names "Xerces" and "Apache Software Foundation" must
+ *    not be used to endorse or promote products derived from this
+ *    software without prior written permission. For written
+ *    permission, please contact apache@apache.org.
+ *
+ * 5. Products derived from this software may not be called "Apache",
+ *    nor may "Apache" appear in their name, without prior written
+ *    permission of the Apache Software Foundation.
+ *
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ====================================================================
+ *
+ * This software consists of voluntary contributions made by many
+ * individuals on behalf of the Apache Software Foundation and was
+ * originally based on software copyright (c) 1999, International
+ * Business Machines, Inc., http://www.apache.org.  For more
+ * information on the Apache Software Foundation, please see
+ * <http://www.apache.org/>.
+ */
+package com.sun.org.apache.xerces.internal.util;
+
+import com.sun.org.apache.xerces.internal.xni.*;
+import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentFilter;
+import com.sun.org.apache.xerces.internal.xni.parser.XMLDocumentSource;
+
+public class TeeXMLDocumentFilterImpl implements XMLDocumentFilter{
+    private XMLDocumentHandler next;
+    private XMLDocumentHandler side;
+    private XMLDocumentSource source;
+
+    public XMLDocumentHandler getSide(){
+        return side;
+    }
+
+    public void setSide(XMLDocumentHandler side){
+        this.side=side;
+    }
+
+    public void startDocument(
+            XMLLocator locator,
+            String encoding,
+            NamespaceContext namespaceContext,
+            Augmentations augs)
+            throws XNIException{
+        side.startDocument(locator,encoding,namespaceContext,augs);
+        next.startDocument(locator,encoding,namespaceContext,augs);
+    }    public XMLDocumentSource getDocumentSource(){
+        return source;
+    }
+
+    public void xmlDecl(String version,String encoding,String standalone,Augmentations augs) throws XNIException{
+        side.xmlDecl(version,encoding,standalone,augs);
+        next.xmlDecl(version,encoding,standalone,augs);
+    }    public void setDocumentSource(XMLDocumentSource source){
+        this.source=source;
+    }
+
+    public void doctypeDecl(String rootElement,String publicId,String systemId,Augmentations augs)
+            throws XNIException{
+        side.doctypeDecl(rootElement,publicId,systemId,augs);
+        next.doctypeDecl(rootElement,publicId,systemId,augs);
+    }    public XMLDocumentHandler getDocumentHandler(){
+        return next;
+    }
+
+    public void comment(XMLString text,Augmentations augs) throws XNIException{
+        side.comment(text,augs);
+        next.comment(text,augs);
+    }    public void setDocumentHandler(XMLDocumentHandler handler){
+        next=handler;
+    }
+
+    public void processingInstruction(String target,XMLString data,Augmentations augs) throws XNIException{
+        side.processingInstruction(target,data,augs);
+        next.processingInstruction(target,data,augs);
+    }
+
+    public void startElement(QName element,XMLAttributes attributes,Augmentations augs) throws XNIException{
+        side.startElement(element,attributes,augs);
+        next.startElement(element,attributes,augs);
+    }
+
+    public void emptyElement(QName element,XMLAttributes attributes,Augmentations augs) throws XNIException{
+        side.emptyElement(element,attributes,augs);
+        next.emptyElement(element,attributes,augs);
+    }
+
+    public void startGeneralEntity(String name,XMLResourceIdentifier identifier,String encoding,Augmentations augs)
+            throws XNIException{
+        side.startGeneralEntity(name,identifier,encoding,augs);
+        next.startGeneralEntity(name,identifier,encoding,augs);
+    }
+
+    public void textDecl(String version,String encoding,Augmentations augs) throws XNIException{
+        side.textDecl(version,encoding,augs);
+        next.textDecl(version,encoding,augs);
+    }
+
+    public void endGeneralEntity(String name,Augmentations augs) throws XNIException{
+        side.endGeneralEntity(name,augs);
+        next.endGeneralEntity(name,augs);
+    }
+
+    //
+//
+// XMLDocumentHandler implementation
+//
+//
+    public void characters(XMLString text,Augmentations augs) throws XNIException{
+        side.characters(text,augs);
+        next.characters(text,augs);
+    }
+
+    public void ignorableWhitespace(XMLString text,Augmentations augs) throws XNIException{
+        side.ignorableWhitespace(text,augs);
+        next.ignorableWhitespace(text,augs);
+    }
+
+    public void endElement(QName element,Augmentations augs) throws XNIException{
+        side.endElement(element,augs);
+        next.endElement(element,augs);
+    }
+
+    public void startCDATA(Augmentations augs) throws XNIException{
+        side.startCDATA(augs);
+        next.startCDATA(augs);
+    }
+
+    public void endCDATA(Augmentations augs) throws XNIException{
+        side.endCDATA(augs);
+        next.endCDATA(augs);
+    }
+
+    public void endDocument(Augmentations augs) throws XNIException{
+        side.endDocument(augs);
+        next.endDocument(augs);
+    }
+
+
+
+
+
+
+
+
+}

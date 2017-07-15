@@ -1,0 +1,97 @@
+/**
+ * Copyright (c) 2007, 2017, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ * <p>
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package com.sun.org.apache.xml.internal.security.utils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
+public class UnsyncBufferedOutputStream extends OutputStream{
+    static final int size=8*1024;
+    private final OutputStream out;
+    private final byte[] buf;
+    private int pointer=0;
+
+    public UnsyncBufferedOutputStream(OutputStream out){
+        buf=new byte[size];
+        this.out=out;
+    }
+
+    public void write(int arg0) throws IOException{
+        if(pointer>=size){
+            flushBuffer();
+        }
+        buf[pointer++]=(byte)arg0;
+    }
+
+    public void write(byte[] arg0) throws IOException{
+        write(arg0,0,arg0.length);
+    }
+
+    public void write(byte[] arg0,int arg1,int len) throws IOException{
+        int newLen=pointer+len;
+        if(newLen>size){
+            flushBuffer();
+            if(len>size){
+                out.write(arg0,arg1,len);
+                return;
+            }
+            newLen=len;
+        }
+        System.arraycopy(arg0,arg1,buf,pointer,len);
+        pointer=newLen;
+    }
+
+    private void flushBuffer() throws IOException{
+        if(pointer>0){
+            out.write(buf,0,pointer);
+        }
+        pointer=0;
+    }
+
+    public void flush() throws IOException{
+        flushBuffer();
+        out.flush();
+    }
+
+    public void close() throws IOException{
+        flush();
+        out.close();
+    }
+}

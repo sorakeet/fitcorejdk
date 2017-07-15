@@ -1,0 +1,57 @@
+/**
+ * Copyright (c) 2002, 2003, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+package com.sun.corba.se.impl.naming.namingutil;
+
+import com.sun.corba.se.impl.logging.NamingSystemException;
+import com.sun.corba.se.spi.logging.CORBALogDomains;
+import org.omg.CORBA.DATA_CONVERSION;
+
+import java.io.StringWriter;
+
+class Utility{
+    private static NamingSystemException wrapper=
+            NamingSystemException.get(CORBALogDomains.NAMING);
+
+    static String cleanEscapes(String stringToDecode){
+        StringWriter theStringWithoutEscape=new StringWriter();
+        for(int i=0;i<stringToDecode.length();i++){
+            char c=stringToDecode.charAt(i);
+            if(c!='%'){
+                theStringWithoutEscape.write(c);
+            }else{
+                // Get the two hexadecimal digits and convert that into int
+                i++;
+                int Hex1=hexOf(stringToDecode.charAt(i));
+                i++;
+                int Hex2=hexOf(stringToDecode.charAt(i));
+                int value=(Hex1*16)+Hex2;
+                // Convert the integer to ASCII
+                theStringWithoutEscape.write((char)value);
+            }
+        }
+        return theStringWithoutEscape.toString();
+    }
+
+    static int hexOf(char x){
+        int val;
+        val=x-'0';
+        if(val>=0&&val<=9)
+            return val;
+        val=(x-'a')+10;
+        if(val>=10&&val<=15)
+            return val;
+        val=(x-'A')+10;
+        if(val>=10&&val<=15)
+            return val;
+        throw new DATA_CONVERSION();
+    }
+
+    static void validateGIOPVersion(IIOPEndpointInfo endpointInfo){
+        if((endpointInfo.getMajor()>NamingConstants.MAJORNUMBER_SUPPORTED)||
+                (endpointInfo.getMinor()>NamingConstants.MINORNUMBERMAX)){
+            throw wrapper.insBadAddress();
+        }
+    }
+}

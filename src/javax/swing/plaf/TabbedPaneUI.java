@@ -1,0 +1,16 @@
+/**
+ * Copyright (c) 1997, 1998, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+package javax.swing.plaf;
+
+import javax.swing.*;
+import java.awt.*;
+
+public abstract class TabbedPaneUI extends ComponentUI{
+    public abstract int tabForCoordinate(JTabbedPane pane,int x,int y);
+
+    public abstract Rectangle getTabBounds(JTabbedPane pane,int index);
+
+    public abstract int getTabRunCount(JTabbedPane pane);
+}

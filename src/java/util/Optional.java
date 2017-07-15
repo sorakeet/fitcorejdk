@@ -1,0 +1,119 @@
+/**
+ * Copyright (c) 2012, 2013, Oracle and/or its affiliates. All rights reserved.
+ * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+package java.util;
+
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public final class Optional<T>{
+    private static final Optional<?> EMPTY=new Optional<>();
+    private final T value;
+
+    private Optional(){
+        this.value=null;
+    }
+
+    private Optional(T value){
+        this.value=Objects.requireNonNull(value);
+    }
+
+    public T get(){
+        if(value==null){
+            throw new NoSuchElementException("No value present");
+        }
+        return value;
+    }
+
+    public void ifPresent(Consumer<? super T> consumer){
+        if(value!=null)
+            consumer.accept(value);
+    }
+
+    public Optional<T> filter(Predicate<? super T> predicate){
+        Objects.requireNonNull(predicate);
+        if(!isPresent())
+            return this;
+        else
+            return predicate.test(value)?this:empty();
+    }
+
+    public static <T> Optional<T> empty(){
+        @SuppressWarnings("unchecked")
+        Optional<T> t=(Optional<T>)EMPTY;
+        return t;
+    }
+
+    public boolean isPresent(){
+        return value!=null;
+    }
+
+    public <U> Optional<U> map(Function<? super T,? extends U> mapper){
+        Objects.requireNonNull(mapper);
+        if(!isPresent())
+            return empty();
+        else{
+            return Optional.ofNullable(mapper.apply(value));
+        }
+    }
+
+    public static <T> Optional<T> ofNullable(T value){
+        return value==null?empty():of(value);
+    }
+
+    public static <T> Optional<T> of(T value){
+        return new Optional<>(value);
+    }
+
+    public <U> Optional<U> flatMap(Function<? super T,Optional<U>> mapper){
+        Objects.requireNonNull(mapper);
+        if(!isPresent())
+            return empty();
+        else{
+            return Objects.requireNonNull(mapper.apply(value));
+        }
+    }
+
+    public T orElse(T other){
+        return value!=null?value:other;
+    }
+
+    public T orElseGet(Supplier<? extends T> other){
+        return value!=null?value:other.get();
+    }
+
+    public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X{
+        if(value!=null){
+            return value;
+        }else{
+            throw exceptionSupplier.get();
+        }
+    }
+
+    @Override
+    public int hashCode(){
+        return Objects.hashCode(value);
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this==obj){
+            return true;
+        }
+        if(!(obj instanceof Optional)){
+            return false;
+        }
+        Optional<?> other=(Optional<?>)obj;
+        return Objects.equals(value,other.value);
+    }
+
+    @Override
+    public String toString(){
+        return value!=null
+                ?String.format("Optional[%s]",value)
+                :"Optional.empty";
+    }
+}
