@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="IdProvider" IDEtalkID="44045D479ACC4D65620D2786EFC2B094" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false">
+    <output url="file://$PROJECT_DIR$/out" />
+  </component>
+  <component name="Struts Navigator">
+    <option name="strutsConfigFile" />
+    <option name="strutsTilesFile" />
+    <option name="strutsValidatorFiles" />
+    <option name="enable" value="false" />
+  </component>
+  <component name="SvnBranchConfigurationManager">
+    <option name="mySupportsUserInfoFilter" value="true" />
+  </component>
+</project>
